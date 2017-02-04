@@ -376,7 +376,7 @@ Feeder = new function () {
 			context.clearRect(0, 0, canvas.width, canvas.height)
 			
 			// Change the text of the info screen and show it
-			info.innerHTML = '<p id="game-over">Game over!</p>'
+			info.innerHTML = '<p id="game-over">Game over</p><p id="hbd">HAPPY BIRTHDAY HOWON!</p>'
 			info.appendChild(window.upsetHowon)
 			info.style.display = 'block'
 			
