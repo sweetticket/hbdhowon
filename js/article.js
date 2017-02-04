@@ -44,8 +44,10 @@ Movable.prototype = {
 		if (this.image) {
 			image = this.image
 
-		} else {
+		} else if (window.isFoodMode) {
 			image = this.isGood ? window.loadedGoodFood[this.imageName] : window.loadedBadFood[this.imageName]
+		} else {
+			image = this.isGood ? window.loadedGoodLife[this.imageName] : window.loadedBadLife[this.imageName]
 		}
 
     context.drawImage(image, this.x, this.y, this.width, this.height)
@@ -153,7 +155,13 @@ Block.prototype.initImage = function () {
 	// randomly choose between good and bad
 	this.isGood = Math.random() < 0.5 ? true : false
 
-	var names = this.isGood ? window.goodFood : window.badFood
+	var names
+
+	if (window.isFoodMode) {
+		names = this.isGood ? window.goodFood : window.badFood
+	} else {
+		names = this.isGood ? window.goodLife : window.badLife
+	}
 
 	// get a random image name
 	this.imageName = names[Math.floor(Math.random() * names.length)]
@@ -454,6 +462,7 @@ Feeder = new function () {
 				// The player should go up a level
 				levelUp = true
 				level++
+				window.isFoodMode = !window.isFoodMode
 				
 				blocksSpawnSec *= 0.99
 				blockData['ySpeed'] *= 1.01
@@ -495,7 +504,7 @@ Feeder = new function () {
 				blocksOnScreen--
 			}
 			
-			if (window.loadedGoodFood[block.imageName]) {
+			if (window.loadedGoodFood[block.imageName] || window.loadedGoodLife[block.imageName]) {
 				// So give the player some points
 				score.change(block.strength)
 				basket.image = window.happyHowon
@@ -508,7 +517,7 @@ Feeder = new function () {
 		} else { // If it's not, the block has missed the basket and will thus, eventually, collide with the ground
 
 			// The player missed a good block and no damage has been inflicted yet
-			if (window.loadedGoodFood[block.imageName] && block.strength > 0
+			if ((window.loadedGoodFood[block.imageName] || window.loadedGoodLife[block.imageName]) && block.strength > 0
 					&& block.y + block.height >= canvas.height) {
 				// So lets inflict damage to the health of the player
 				health.change(- block.strength)
@@ -554,7 +563,7 @@ var loadImage = function (name, path, loadedImages) {
 	image.onload = function () {
 		loadedImages[name] = image
 		window.imagesLoaded++
-		if (window.imagesLoaded == window.goodFood.length + window.badFood.length) {
+		if (window.imagesLoaded == window.totalBlockImages) {
 			loadHowonImage('happyHowon', 'img/happy_howon.png')
 			loadHowonImage('upsetHowon', 'img/upset_howon.png')
 		}
@@ -567,7 +576,7 @@ var loadHowonImage = function (name, path) {
 	image.onload = function () {
 		window[name] = image
 		window.imagesLoaded++
-		if (window.imagesLoaded == window.goodFood.length + window.badFood.length + 2) {
+		if (window.imagesLoaded == window.totalBlockImages + 2) {
 			Feeder.run()
 		}
 	}
@@ -585,6 +594,18 @@ var loadImagesAndRun = function () {
 		var name = badFood[i]
 		var path = 'img/food/bad/' + name + '.png'
 		loadImage(name, path, window.loadedBadFood)
+	}
+
+	for (var i = 0; i < goodLife.length; i++) {
+		var name = goodLife[i]
+		var path = 'img/life/good/' + name + '.png'
+		loadImage(name, path, window.loadedGoodLife)
+	}
+
+	for (var i = 0; i < badLife.length; i++) {
+		var name = badLife[i]
+		var path = 'img/life/bad/' + name + '.png'
+		loadImage(name, path, window.loadedBadLife)
 	}
 
 }
@@ -613,10 +634,36 @@ window.onload = function () {
 		"wine"
 	]
 
+	window.goodLife = [
+		"games",
+		"gift",
+		"money",
+		"puppy",
+		"singing",
+		"sleeping",
+		"taxi"
+	]
+
+	window.badLife = [
+		"alarm",
+		"bus",
+		"computer",
+		"debug",
+		"exercise",
+		"poop",
+	]
+
 	window.loadedGoodFood = {}
 	window.loadedBadFood = {}
+	window.loadedGoodLife = {}
+	window.loadedBadLife = {}
+
+	window.totalBlockImages = window.goodFood.length + window.badFood.length
+														+ window.goodLife.length + window.badLife.length
 
 	window.imagesLoaded = 0
+
+	window.isFoodMode = true
 
 	loadImagesAndRun()
 }
