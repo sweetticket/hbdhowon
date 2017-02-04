@@ -379,6 +379,11 @@ Feeder = new function () {
 			info.innerHTML = '<p id="game-over">Game over!</p>'
 			info.appendChild(window.upsetHowon)
 			info.style.display = 'block'
+
+			var hbd = document.createElement('p')
+			hbd.id = 'hbd'
+			hbd.innerText = 'HAPPY BIRTHDAY HOWON!!!'
+			info.appendChild(hbd)
 			
 			// Do not update the info screen again
 			infoScreenChange = false

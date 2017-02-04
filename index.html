@@ -9,16 +9,29 @@
 		html, body, p {
 			margin: 0px;
 			padding: 0px;
+			width: 100%;
 			font-family: 'VT323', monospace;
+			text-align: center;
+		}
+
+		#hbd {
+			font-size: 30px;
+			padding-top: 20px;
+		}
+
+		#wrapper {
+			position: relative;
+			width: 398px;
+	    margin: 0 auto;
 		}
 		
 		#canvas {
-			border: 1px solid #eee;
-			margin: 10px;
+			border: 2px solid #555;
+			margin: 20px 10px;
 		}
 		#info {
 			position: absolute;
-			top: 92px; /* (10px top margin + 200px of total height for the canvas element - 26px of total height for the info element) / 2 */
+			top: 120px;
 			left: 105px; /* (10px left margin + 400px of total width for the canvas element - 200px of total width for the info element / 2 */
 			
 			text-align: center;
@@ -46,11 +59,22 @@
 			font-size: 24px;
 		}
 
+		#footer {
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
+		}
+
 	</style>
 </head>
 
 <body>
-	<canvas id="canvas" width="398" height="500"></canvas>
-	<div id="info"></div>
+	<div id="wrapper">
+		<canvas id="canvas" width="398" height="480"></canvas>
+		<div id="info"></div>
+	</div>
+	<div id="footer">
+	&copy; sweetticket 2017
+	</div>
 </body>
 </html>
