@@ -32,16 +32,9 @@ Movable.prototype = {
 	},
 	
 	draw: function () {
-		// Inheritors should hold the color which our basket needs to be
-		context.fillStyle = this.color 
-
 		if (this.imageName || this.image) {
 			this.animate()
 
-		} else {
-			// The C2A fillRect method draws a filled rectangle (with fillStyle as its fill color) at position (x, y) with a set height and width.
-			// All these arguments can be found in the atributes of an inheritor
-			context.fillRect(this.x, this.y, this.width, this.height)
 		}
 	},
 
@@ -111,13 +104,9 @@ Basket.prototype.reset = function () {
 	// Reset the position
 	this.x = canvas.width / 2 - this.width / 2
 	this.y = canvas.height - this.height
+
+	this.image = window.happyHowon
 	
-	// Reset the color
-	while (this.color == this.oldColor)
-		this.color = Feeder.colors[Math.round(rand(0, (Feeder.colors.length-1)))]
-	
-	// Change the old color to the current color (so that the while loop will stil work the next time this method is called)
-	this.oldColor = this.color
 }
 
 Basket.prototype.move = function () {
@@ -143,7 +132,7 @@ var Block = function (data) {
 	Movable.call(this, data)
 	
 	this.initPosition()
-	this.initColor()
+	this.initImage()
 }
 
 Block.prototype = new Movable()
@@ -160,12 +149,7 @@ Block.prototype.initPosition = function ()
 	// By setting the vertical position of the block to 0 substracted by the block its height, the block will look like it slides into the canvas its viewport
 	this.y = 0 - this.height
 }
-Block.prototype.initColor = function () {
-	if (this.color !== undefined)
-		return
-
-	this.color = Feeder.colors[Math.round(rand(0, (Feeder.colors.length-1)))]
-
+Block.prototype.initImage = function () {
 	// randomly choose between good and bad
 	this.isGood = Math.random() < 0.5 ? true : false
 
@@ -245,24 +229,16 @@ Score.prototype.draw = function () {
 
 
 Feeder = new function () {
-	this.colors = [
-		'#f00',
-		'#0f0',
-		'#00f',
-	]
 	
 	var basketData = [
-		['width', 66],
+		['width', 60],
 		['height', 77],
 		['xSpeed', 6],
-		['color', '#f00'],
-		['oldColor', '#f00']
 	]
 	var blockData = [
 		['width', 30],
 		['height', 30],
 		['ySpeed', 2],
-		['color', undefined],
 		['strength', 30]
 	]
 	
@@ -318,6 +294,7 @@ Feeder = new function () {
 	}
 	
 	function resetGame() {
+		basket = new Basket(basketData)
 		basket.reset()
 		health.reset()
 		score.reset()
@@ -346,7 +323,16 @@ Feeder = new function () {
 		if (infoScreenChange)
 		{
 			// Set the HTML value of the info DOM object so it displays a fancy titlescreen
-			info.innerHTML = '<p><span class="red">R</span><span class="green">G</span><span class="blue">B</span>Catcher</p> <p>Press spacebar to start</p>'
+			info.innerHTML = '<p id="title">FEED HOWON</p>'
+
+			var displayHappyHowon = document.createElement('p')
+			displayHappyHowon.append(window.happyHowon)
+			displayHappyHowon.id = 'happy-howon-display'
+			info.append(displayHappyHowon)
+
+			var instr = document.createElement('p')
+			instr.innerText = 'Press spacebar to start'
+			info.appendChild(instr)
 			
 			// Only update the info screen once
 			infoScreenChange = false
@@ -382,7 +368,8 @@ Feeder = new function () {
 			context.clearRect(0, 0, canvas.width, canvas.height)
 			
 			// Change the text of the info screen and show it
-			info.innerHTML = '<p>Game over!</p>'
+			info.innerHTML = '<p id="game-over">Game over!</p>'
+			info.appendChild(window.upsetHowon)
 			info.style.display = 'block'
 			
 			// Do not update the info screen again
@@ -390,7 +377,7 @@ Feeder = new function () {
 		}
 		
 		// If three seconds have passed
-		if (frameTime > startTime + (3*1000))
+		if (frameTime > startTime + (5*1000))
 		{	
 			// A new info screen should be pushed next time
 			infoScreenChange = true
@@ -502,28 +489,30 @@ Feeder = new function () {
 		
 		// If the block its x co-ordinate is in the range of the basket its width, then we've got a collision
 		if (basket.x - block.width <= block.x && block.x <= basket.x + basket.width) {
-			// Whether its a correctly colored block or not, the current block should disappear and the amount of blocks on the screen should decrease with one
+			// Whether its a good block or not, the current block should disappear and the amount of blocks on the screen should decrease with one
 			if (block.alive == true) {
 				block.alive = false
 				blocksOnScreen--
 			}
 			
-			// If the block its color matches the basket its current color, we've got a correct catch
-			// if (block.color ===  basket.color) {
 			if (window.loadedGoodFood[block.imageName]) {
 				// So give the player some points
 				score.change(block.strength)
+				basket.image = window.happyHowon
 			} else {
 				// Otherwise, inflict damage to the health of the player
 				health.change(- block.strength)
+				basket.image = window.upsetHowon
 			}
 
 		} else { // If it's not, the block has missed the basket and will thus, eventually, collide with the ground
 
-			// The player missed a correctly colored block and no damage has been inflicted yet
-			if (window.loadedGoodFood[block.imageName] && block.strength > 0) {
+			// The player missed a good block and no damage has been inflicted yet
+			if (window.loadedGoodFood[block.imageName] && block.strength > 0
+					&& block.y + block.height >= canvas.height) {
 				// So lets inflict damage to the health of the player
 				health.change(- block.strength)
+				basket.image = window.upsetHowon
 				
 				// To prevent this block from inflicting damage again, we set its strength to 0
 				block.strength = 0
