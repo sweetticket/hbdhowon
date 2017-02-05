@@ -42,6 +42,11 @@
 			height: 26px;
 			font-size: 18px;
 		}
+
+		#loading {
+			font-weight: bold;
+			font-size: 20px;
+		}
 		
 		/* Some styling for the title screen */
 		#title {
@@ -82,7 +87,9 @@
 <body>
 	<div id="wrapper">
 		<canvas id="canvas" width="398" height="480"></canvas>
-		<div id="info"></div>
+		<div id="info">
+			<p id="loading">LOADING...</p>
+		</div>
 		<div id="key-instr">
 		Use the right and left arrow keys to move Howon. Catch only the things Howon likes, or else Howon will be very upset!!!
 		</div>
