@@ -334,9 +334,9 @@ Feeder = new function () {
 			info.innerHTML = '<p id="title">FEED HOWON</p>'
 
 			var displayHappyHowon = document.createElement('p')
-			displayHappyHowon.append(window.happyHowon)
+			displayHappyHowon.appendChild(window.happyHowon)
 			displayHappyHowon.id = 'happy-howon-display'
-			info.append(displayHappyHowon)
+			info.appendChild(displayHappyHowon)
 
 			var instr = document.createElement('p')
 			instr.innerText = 'Press spacebar to start'
