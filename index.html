@@ -5,6 +5,7 @@
 	<link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta property="og:image" content="http://www.hbdhowon.com/img/fb-preview.png" />
 
   <meta property="og:description" content="Feed Howon on his birthday! Catch only the things Howon likes, or else Howon will be very upset!!!" />
@@ -89,6 +90,17 @@
 			width: 100%;
 			text-align: left;
 			font-size: 16px;
+		}
+
+		@media (max-width: 420px) {
+		  #canvas {
+		    margin: 0;
+		    border-width: 0;
+		  }
+
+		  #key-instr {
+		  	padding: 10px;
+		  }
 		}
 
 	</style>

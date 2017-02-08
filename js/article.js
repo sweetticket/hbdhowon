@@ -67,6 +67,12 @@ function getRelativeCoordinates (event, reference) {
   return x
 }
 
+
+
+
+
+
+
 var canvas
 var context
 var keyOn = []
@@ -341,9 +347,15 @@ Feeder = new function () {
 	var startTime
 	var frameTime
 
+	var isMobile = false
+
 	this.run = function (image) {
 		// Set the global 'canvas' object to the #canvas DOM object to be able to access its width, height and other attributes are
 		canvas = document.getElementById('canvas')
+		if(screen.width < 420) {
+			canvas.width = screen.width
+      canvas.height = screen.height - 200
+		}
 		
 		// Set the local 'info' object to the #info DOM object
 		info = document.getElementById('info')
@@ -374,6 +386,20 @@ Feeder = new function () {
 		canvas.addEventListener('click', function () {
 			// same as space bar
 			keyOn[32] = true
+			mouseControl = true
+			mouseX = getRelativeCoordinates(event, canvas)
+		})
+
+		// touch events
+		canvas.addEventListener('touchstart', function (event) {
+			keyOn[32] = true
+			mouseControl = true
+			mouseX = event.touches[0].clientX
+		})
+
+		canvas.addEventListener('touchmove', function (event) {
+			mouseControl = true
+			mouseX = event.touches[0].clientX
 		})
 		
 		// Instantiate required objects
