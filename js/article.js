@@ -354,7 +354,11 @@ Feeder = new function () {
 		canvas = document.getElementById('canvas')
 		if(screen.width < 420) {
 			canvas.width = screen.width
-      canvas.height = screen.height - 200
+      canvas.height = screen.height * 2 / 3
+      instr = document.getElementById('key-instr')
+      instr.style.top = (screen.height * 2 / 3) + 'px'
+      info = document.getElementById('info')
+      info.style.left = (screen.width - 200) / 2 + 'px'
 		}
 		
 		// Set the local 'info' object to the #info DOM object
@@ -391,13 +395,15 @@ Feeder = new function () {
 		})
 
 		// touch events
-		canvas.addEventListener('touchstart', function (event) {
+		document.addEventListener('touchstart', function (event) {
+			event.preventDefault()
 			keyOn[32] = true
 			mouseControl = true
 			mouseX = event.touches[0].clientX
 		})
 
-		canvas.addEventListener('touchmove', function (event) {
+		document.addEventListener('touchmove', function (event) {
+			event.preventDefault()
 			mouseControl = true
 			mouseX = event.touches[0].clientX
 		})
@@ -489,6 +495,7 @@ Feeder = new function () {
 			info.innerHTML = '<p id="game-over">Game over</p><p id="hbd">HAPPY BIRTHDAY HOWON!</p>'
 			info.appendChild(window.upsetHowon)
 			info.style.display = 'block'
+			info.style.marginTop = '10px'
 			
 			// Do not update the info screen again
 			infoScreenChange = false
