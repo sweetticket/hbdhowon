@@ -1,11 +1,77 @@
-function rand(min, max) 
-{
+function rand(min, max) {
 	return Math.random() * (max-min) + min
+}
+
+function getAbsolutePosition (element) {
+  var rX = element.offsetLeft
+  if (element.offsetParent) {
+    var tmpX = getAbsolutePosition(element.offsetParent)
+    rX += tmpX
+  }
+  return rX
+}
+
+/**
+ * Retrieve the coordinates of the given event relative to the center
+ * of the widget.
+ *
+ * @param event
+ *   A mouse-related DOM event.
+ * @param reference
+ *   A DOM element whose position we want to transform the mouse coordinates to.
+ * @return
+ *    A hash containing keys 'x' and 'y'.
+ */
+function getRelativeCoordinates (event, reference) {
+  var x, y;
+  event = event || window.event
+  var el = event.target || event.srcElement
+
+  if (!window.opera && typeof event.offsetX != 'undefined') {
+    // Use offset coordinates and find common offsetParent
+    var posX = event.offsetX
+
+    // Send the coordinates upwards through the offsetParent chain.
+    var e = el
+    while (e) {
+      e.mouseX = posX;
+      posX += e.offsetLeft;
+      e = e.offsetParent;
+    }
+
+    // Look for the coordinates starting from the reference element.
+    var e = reference;
+    var offsetX = 0
+    while (e) {
+      if (typeof e.mouseX != 'undefined') {
+        x = e.mouseX - offsetX
+        break
+      }
+      offsetX += e.offsetLeft
+      e = e.offsetParent
+    }
+
+    // Reset stored coordinates
+    e = el
+    while (e) {
+      e.mouseX = undefined
+      e = e.offsetParent
+    }
+  }
+  else {
+    // Use absolute coordinates
+    var pos = getAbsolutePosition(reference)
+    x = event.pageX  - posX
+  }
+  // Subtract distance to middle
+  return x
 }
 
 var canvas
 var context
 var keyOn = []
+var mouseControl = false
+var mouseX = 0
 
 // MOVEABLE //
 
@@ -120,6 +186,11 @@ Basket.prototype.move = function () {
 	if (keyOn[39])
 		this.x += this.xSpeed
 
+	// mouse control
+	if (mouseControl) {
+		this.x =  mouseX - this.width / 2
+	}
+
 	// If the x co-ordinate is lower than 0, which is less than the outer left position of the canvas, move it back to the outer left position of the canvas 
 	if (this.x < 0)
 		this.x = 0
@@ -127,6 +198,7 @@ Basket.prototype.move = function () {
 	// If the x co-ordinate plus the basket its width is greater than the canvas its width, move it back to the outer right position of the canvas
 	if (this.x + this.width > canvas.width)
 		this.x = canvas.width - this.width
+
 }
 
 
@@ -283,6 +355,7 @@ Feeder = new function () {
 		document.addEventListener('keydown', function (event) {
 			// Add the keyCode of this event to the global keyOn Array
 			// We can then easily check if a specific key is pressed by simply checking whether its keycode is set to true
+			mouseControl = false
 			keyOn[event.keyCode] = true
 		}, false)
 	
@@ -291,6 +364,17 @@ Feeder = new function () {
 			// Set the keyCode of this event to false, to avoid an inifinite keydown appearance
 			keyOn[event.keyCode] = false
 		}, false)
+
+		// Mouse events
+		canvas.addEventListener('mousemove', function (event) {
+			mouseControl = true
+			mouseX = getRelativeCoordinates(event, canvas)
+		})
+
+		canvas.addEventListener('click', function () {
+			// same as space bar
+			keyOn[32] = true
+		})
 		
 		// Instantiate required objects
 		basket = new Basket(basketData)
